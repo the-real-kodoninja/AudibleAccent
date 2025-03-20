@@ -1,6 +1,7 @@
 // src/components/ReadLog.tsx
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { useTheme } from '../context/ThemeContext';
 
 interface LogEntry {
   fileName: string;
@@ -9,6 +10,7 @@ interface LogEntry {
 
 const ReadLog: React.FC = () => {
   const [log, setLog] = useState<LogEntry[]>([]);
+  const { themeMode } = useTheme();
 
   useEffect(() => {
     const savedLog = JSON.parse(localStorage.getItem('readLog') || '[]');

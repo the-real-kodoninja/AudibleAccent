@@ -1,6 +1,7 @@
 // src/components/PagePreview.tsx
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { useTheme } from '../context/ThemeContext';
 
 interface PagePreviewProps {
   pages: string[];
@@ -9,6 +10,8 @@ interface PagePreviewProps {
 }
 
 const PagePreview: React.FC<PagePreviewProps> = ({ pages, currentPage, onPageSelect }) => {
+  const { themeMode } = useTheme();
+
   return (
     <Box
       sx={{

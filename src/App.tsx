@@ -6,8 +6,9 @@ import WelcomeScreen from './components/WelcomeScreen';
 import ReadLog from './components/ReadLog';
 import UserPage from './components/UserPage';
 import PagePreview from './components/PagePreview';
-import { CssBaseline, ThemeProvider, createTheme, Box, Tabs, Tab } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider, CssBaseline, createTheme, Box, Tabs, Tab } from '@mui/material';
 import * as pdfjsLib from 'pdfjs-dist';
+import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 
 const App: React.FC = () => {
   const [text, setText] = useState<string>('');
@@ -15,7 +16,6 @@ const App: React.FC = () => {
   const [textSize, setTextSize] = useState<number>(() => parseInt(localStorage.getItem('textSize') || '16', 10));
   const [highlightColor, setHighlightColor] = useState<string>(() => localStorage.getItem('highlightColor') || '#D2B48C');
   const [fontFamily, setFontFamily] = useState<string>(() => localStorage.getItem('fontFamily') || 'Roboto');
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => (localStorage.getItem('themeMode') as 'light' | 'dark') || 'dark');
   const [pages, setPages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
@@ -68,10 +68,6 @@ const App: React.FC = () => {
     localStorage.setItem('fontFamily', fontFamily);
   }, [fontFamily]);
 
-  useEffect(() => {
-    localStorage.setItem('themeMode', themeMode);
-  }, [themeMode]);
-
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
@@ -101,46 +97,52 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSetText = (newText: string) => {
+    console.log('Setting text in App:', newText);
+    setText(newText);
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <TopBar setText={setText} onFileLoad={handleFileLoad} />
-      <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523' }}>
-        <Tab label="Reader" />
-        <Tab label="Read Log" />
-        <Tab label="User" />
-      </Tabs>
-      <Box sx={{ display: 'flex', height: 'calc(100vh - 112px)' }}>
-        {tab === 0 && pages.length > 0 && (
-          <PagePreview pages={pages} currentPage={currentPage} onPageSelect={setCurrentPage} />
-        )}
-        <Box sx={{ flex: 1, overflowY: 'auto' }}>
-          {tab === 0 &&
-            (text ? (
-              <TextReader
-                text={text}
-                textSize={textSize}
-                highlightColor={highlightColor}
-                fontFamily={fontFamily}
-                onPageChange={setCurrentPage}
-                currentPage={currentPage}
-                totalPages={pages.length || 1}
-              />
-            ) : (
-              <WelcomeScreen />
-            ))}
-          {tab === 1 && <ReadLog />}
-          {tab === 2 && (
-            <UserPage
-              setThemeMode={setThemeMode}
-              setTextSize={setTextSize}
-              setHighlightColor={setHighlightColor}
-              setFontFamily={setFontFamily}
-            />
+    <CustomThemeProvider>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        <TopBar setText={handleSetText} onFileLoad={handleFileLoad} />
+        <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523' }}>
+          <Tab label="Reader" />
+          <Tab label="Read Log" />
+          <Tab label="User" />
+        </Tabs>
+        <Box sx={{ display: 'flex', height: 'calc(100vh - 112px)' }}>
+          {tab === 0 && pages.length > 0 && (
+            <PagePreview pages={pages} currentPage={currentPage} onPageSelect={setCurrentPage} />
           )}
+          <Box sx={{ flex: 1, overflowY: 'auto' }}>
+            {tab === 0 &&
+              (text ? (
+                <TextReader
+                  text={text}
+                  textSize={textSize}
+                  highlightColor={highlightColor}
+                  fontFamily={fontFamily}
+                  onPageChange={setCurrentPage}
+                  currentPage={currentPage}
+                  totalPages={pages.length || 1}
+                />
+              ) : (
+                <WelcomeScreen />
+              ))}
+            {tab === 1 && <ReadLog />}
+            {tab === 2 && (
+              <UserPage
+                setTextSize={setTextSize}
+                setHighlightColor={setHighlightColor}
+                setFontFamily={setFontFamily}
+              />
+            )}
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
+      </MuiThemeProvider>
+    </CustomThemeProvider>
   );
 };
 

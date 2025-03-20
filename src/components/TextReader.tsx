@@ -30,11 +30,24 @@ const TextReader: React.FC<TextReaderProps> = ({
 
   useEffect(() => {
     console.log('TextReader rendering with text:', text);
-    readAndHighlight(text, 1, currentIndex, setCurrentIndex);
-  }, [text, currentIndex]);
+    readAndHighlight(text, 1, currentIndex, setCurrentIndex, undefined, () => {
+      // On end of reading, move to next page if available
+      if (currentPage < totalPages) {
+        onPageChange(currentPage + 1);
+        setCurrentIndex(0); // Reset index for the new page
+      }
+    });
+  }, [text, currentIndex, currentPage, totalPages, onPageChange]);
 
   useEffect(() => {
     localStorage.setItem(`progress_${text.slice(0, 10)}`, currentIndex.toString());
+    // Auto-scroll to the highlighted word
+    if (textRef.current) {
+      const highlighted = textRef.current.querySelector('.highlight') as HTMLElement;
+      if (highlighted) {
+        textRef.current.scrollTo({ top: highlighted.offsetTop - 50, behavior: 'smooth' });
+      }
+    }
   }, [currentIndex, text]);
 
   const handleStartAtCursor = () => {
@@ -57,7 +70,8 @@ const TextReader: React.FC<TextReaderProps> = ({
       const index = words.findIndex((word) => word.toLowerCase().includes(searchTerm.toLowerCase()));
       if (index !== -1) {
         setCurrentIndex(index);
-        textRef.current.scrollTo({ top: textRef.current.children[index].offsetTop, behavior: 'smooth' });
+        const target = textRef.current.children[index] as HTMLElement;
+        textRef.current.scrollTo({ top: target.offsetTop - 50, behavior: 'smooth' });
       } else {
         alert('Text not found');
       }

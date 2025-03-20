@@ -4,7 +4,8 @@ export const readAndHighlight = (
     speed: number,
     startIndex: number = 0,
     setCurrentIndex: (index: number) => void,
-    voiceName?: string
+    voiceName?: string,
+    onEnd?: () => void
   ) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = speed;
@@ -25,8 +26,10 @@ export const readAndHighlight = (
       }
     };
   
-    utterance.onend = () =>
+    utterance.onend = () => {
       document.querySelectorAll('.word').forEach((word) => word.classList.remove('highlight'));
+      if (onEnd) onEnd();
+    };
   
     window.speechSynthesis.speak(utterance);
   };

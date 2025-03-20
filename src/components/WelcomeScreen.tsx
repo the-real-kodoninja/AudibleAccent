@@ -1,9 +1,11 @@
 // src/components/WelcomeScreen.tsx
 import React, { useRef } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
+import { useTheme } from '../context/ThemeContext';
 
 const WelcomeScreen: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { themeMode } = useTheme();
 
   const handleIconClick = () => {
     fileInputRef.current?.click();

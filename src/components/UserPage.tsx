@@ -1,6 +1,7 @@
 // src/components/UserPage.tsx
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Typography, TextField, Button, Slider, Input, Select, MenuItem, Switch } from '@mui/material';
+import { Box, Typography, TextField, Button, Slider, Input, Select, MenuItem, Switch, SelectChangeEvent } from '@mui/material';
+import { useTheme } from '../context/ThemeContext';
 
 interface UserData {
   name: string;
@@ -10,13 +11,12 @@ interface UserData {
 }
 
 interface UserPageProps {
-  setThemeMode: (mode: 'light' | 'dark') => void;
   setTextSize: (size: number) => void;
   setHighlightColor: (color: string) => void;
   setFontFamily: (font: string) => void;
 }
 
-const UserPage: React.FC<UserPageProps> = ({ setThemeMode, setTextSize, setHighlightColor, setFontFamily }) => {
+const UserPage: React.FC<UserPageProps> = ({ setTextSize, setHighlightColor, setFontFamily }) => {
   const [user, setUser] = useState<UserData>(() => {
     const savedUser = localStorage.getItem('userData');
     return savedUser
@@ -28,8 +28,8 @@ const UserPage: React.FC<UserPageProps> = ({ setThemeMode, setTextSize, setHighl
   const [textSize, setLocalTextSize] = useState<number>(() => parseInt(localStorage.getItem('textSize') || '16', 10));
   const [highlightColor, setLocalHighlightColor] = useState<string>(() => localStorage.getItem('highlightColor') || '#D2B48C');
   const [fontFamily, setLocalFontFamily] = useState<string>(() => localStorage.getItem('fontFamily') || 'Roboto');
-  const [themeMode, setLocalThemeMode] = useState<'light' | 'dark'>(() => (localStorage.getItem('themeMode') as 'light' | 'dark') || 'dark');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { themeMode, setThemeMode } = useTheme();
 
   useEffect(() => {
     const log = JSON.parse(localStorage.getItem('readLog') || '[]');
@@ -49,7 +49,6 @@ const UserPage: React.FC<UserPageProps> = ({ setThemeMode, setTextSize, setHighl
     setTextSize(textSize);
     setHighlightColor(highlightColor);
     setFontFamily(fontFamily);
-    setThemeMode(themeMode);
     setIsEditing(false);
   };
 
@@ -84,12 +83,12 @@ const UserPage: React.FC<UserPageProps> = ({ setThemeMode, setTextSize, setHighl
     setLocalHighlightColor(e.target.value);
   };
 
-  const handleFontChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-    setLocalFontFamily(e.target.value as string);
+  const handleFontChange = (e: SelectChangeEvent<string>) => {
+    setLocalFontFamily(e.target.value);
   };
 
   const handleThemeChange = () => {
-    setLocalThemeMode(themeMode === 'dark' ? 'light' : 'dark');
+    setThemeMode(themeMode === 'dark' ? 'light' : 'dark');
   };
 
   return (

@@ -2,7 +2,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import ePub from 'epubjs';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 export const parseFile = async (file: File): Promise<string> => {
   const fileType = file.type;
@@ -31,14 +31,14 @@ const parsePDF = async (file: File): Promise<string> => {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageText = textContent.items.map((item: any) => item.str || '').join(' ');
-      fullText += pageText + '\n'; // Add newline between pages
+      fullText += pageText + '\n';
     }
 
     console.log('PDF parsed text:', fullText);
     return fullText.trim();
-  } catch (error) {
+  } catch (error: any) {
     console.error('PDF parsing error:', error);
-    throw new Error(`Failed to parse PDF: ${error.message}`);
+    throw new Error(`Failed to parse PDF: ${error.message || 'Unknown error'}`);
   }
 };
 
@@ -56,9 +56,9 @@ const parseEPUB = async (file: File): Promise<string> => {
 
     console.log('EPUB parsed text:', fullText);
     return fullText.trim();
-  } catch (error) {
+  } catch (error: any) {
     console.error('EPUB parsing error:', error);
-    throw new Error(`Failed to parse EPUB: ${error.message}`);
+    throw new Error(`Failed to parse EPUB: ${error.message || 'Unknown error'}`);
   }
 };
 

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { parseFile } from '../utils/fileParser';
 import { readAndHighlight } from '../utils/speech';
 import { AppBar, Toolbar, Button, Select, MenuItem, Input } from '@mui/material';
+import { useTheme } from '../context/ThemeContext';
 
 const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: File) => void }> = ({ setText, onFileLoad }) => {
   const [speed, setSpeed] = useState(1);
@@ -11,6 +12,7 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
   const [selectedVoice, setSelectedVoice] = useState<string>('');
   const [text, setLocalText] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { themeMode } = useTheme();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -36,9 +38,9 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
         log.unshift({ fileName: file.name, timestamp: new Date().toISOString() });
         localStorage.setItem('readLog', JSON.stringify(log));
         onFileLoad(file);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Upload error:', error);
-        alert(`Failed to parse file: ${error.message}`);
+        alert(`Failed to parse file: ${error.message || 'Unknown error'}`);
       }
     }
   };
