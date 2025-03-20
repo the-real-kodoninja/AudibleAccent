@@ -16,11 +16,11 @@ const WelcomeScreen: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 'calc(100vh - 112px)',
-        bgcolor: '#1A1A1A',
+        height: '100%',
+        bgcolor: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5',
       }}
     >
-      <Typography variant="h6" sx={{ color: '#A1A1A1', mb: 2 }}>
+      <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#A1A1A1' : '#333333', mb: 2, fontWeight: 400 }}>
         Welcome to AudibleAccent! Upload a PDF, EPUB, or text file to start.
       </Typography>
       <IconButton onClick={handleIconClick}>

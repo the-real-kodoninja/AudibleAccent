@@ -4,7 +4,7 @@ import { parseFile } from '../utils/fileParser';
 import { readAndHighlight } from '../utils/speech';
 import { AppBar, Toolbar, Button, Select, MenuItem, Input } from '@mui/material';
 
-const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
+const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: File) => void }> = ({ setText, onFileLoad }) => {
   const [speed, setSpeed] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -27,16 +27,18 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
     if (file) {
       try {
         const parsedText = await parseFile(file);
+        console.log('Setting text in TopBar:', parsedText);
         setText(parsedText);
         setLocalText(parsedText);
         setIsPlaying(true);
-        readAndHighlight(parsedText, speed, 0, () => {}, selectedVoice); // Matches 5 args
+        readAndHighlight(parsedText, speed, 0, () => {}, selectedVoice);
         const log = JSON.parse(localStorage.getItem('readLog') || '[]');
         log.unshift({ fileName: file.name, timestamp: new Date().toISOString() });
         localStorage.setItem('readLog', JSON.stringify(log));
+        onFileLoad(file);
       } catch (error) {
-        console.error('Error parsing file:', error);
-        alert('Failed to parse file. Please try a supported format (PDF, EPUB, TXT).');
+        console.error('Upload error:', error);
+        alert(`Failed to parse file: ${error.message}`);
       }
     }
   };
@@ -64,7 +66,7 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #8B5523' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5', borderBottom: '1px solid #8B5523' }}>
       <Toolbar sx={{ justifyContent: 'center', gap: 2 }}>
         <Button onClick={togglePlayPause} color="primary" variant="contained">
           {isPlaying ? 'Pause' : 'Play'}
@@ -72,7 +74,7 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
         <Select
           value={speed}
           onChange={(e) => setSpeed(parseFloat(e.target.value as string))}
-          sx={{ color: '#D2B48C', backgroundColor: '#A1A1A1' }}
+          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#A1A1A1' : '#FFFFFF' }}
         >
           <MenuItem value={0.5}>0.5x</MenuItem>
           <MenuItem value={1}>1x</MenuItem>
@@ -81,7 +83,7 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
         <Select
           value={selectedVoice}
           onChange={(e) => setSelectedVoice(e.target.value as string)}
-          sx={{ color: '#D2B48C', backgroundColor: '#A1A1A1', minWidth: 150 }}
+          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#A1A1A1' : '#FFFFFF', minWidth: 150 }}
         >
           {voices.map((voice) => (
             <MenuItem key={voice.name} value={voice.name}>
