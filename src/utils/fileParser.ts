@@ -39,7 +39,7 @@ const parseEPUB = async (file: File): Promise<string> => {
   let fullText = '';
 
   const contents = await book.loaded.spine;
-  for (const item of contents.items) { // Correct: 'items', not 'spineItems'
+  for (const item of (contents as any).items) { // Type assertion for TS2339 fix
     const doc = await item.load(book.load.bind(book));
     fullText += doc.documentElement.textContent || '';
   }
