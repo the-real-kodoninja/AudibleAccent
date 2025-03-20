@@ -1,0 +1,15 @@
+{
+  "name": "AudibleAccent",
+  "short_name": "AudibleAccent",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A1A",
+  "theme_color": "#8B5523",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

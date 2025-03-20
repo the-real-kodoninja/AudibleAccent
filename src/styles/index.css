@@ -1,0 +1,6 @@
+/* src/styles/index.css */
+.highlight {
+    background-color: #D2B48C; /* Tan */
+    color: #1A1A1A; /* Black */
+    transition: background-color 0.2s ease;
+  }
