@@ -1,6 +1,7 @@
-// src/components/WelcomeScreen.tsx
+// client/src/components/WelcomeScreen.tsx
 import React, { useRef } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
+import { UploadFile } from '@mui/icons-material';
 import { useTheme } from '../context/ThemeContext';
 
 const WelcomeScreen: React.FC = () => {
@@ -19,14 +20,20 @@ const WelcomeScreen: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100%',
-        bgcolor: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5',
+        bgcolor: themeMode === 'dark' ? '#1A1A1A' : '#FFFFFF',
+        borderRadius: 2,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        p: 4,
       }}
     >
-      <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#A1A1A1' : '#333333', mb: 2, fontWeight: 400 }}>
-        Welcome to AudibleAccent! Upload a PDF, EPUB, or text file to start.
+      <Typography variant="h5" sx={{ color: themeMode === 'dark' ? '#E0E0E0' : '#333333', mb: 3, fontWeight: 500, textAlign: 'center' }}>
+        Welcome to AudibleAccent!
       </Typography>
-      <IconButton onClick={handleIconClick}>
-        <Typography sx={{ color: '#8B5523', fontSize: '2.5rem' }}>📤</Typography>
+      <Typography sx={{ color: themeMode === 'dark' ? '#A1A1A1' : '#666666', mb: 3, textAlign: 'center' }}>
+        Upload a PDF, EPUB, or text file to start reading with text-to-speech.
+      </Typography>
+      <IconButton onClick={handleIconClick} sx={{ bgcolor: themeMode === 'dark' ? '#2A2A2A' : '#F0F0F0', '&:hover': { bgcolor: themeMode === 'dark' ? '#3A3A3A' : '#E0E0E0' } }}>
+        <UploadFile sx={{ fontSize: 40, color: '#8B5523' }} />
       </IconButton>
       <input
         type="file"

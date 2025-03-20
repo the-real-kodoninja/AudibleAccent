@@ -1,8 +1,9 @@
-// src/components/TopBar.tsx
+// client/src/components/TopBar.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { parseFile } from '../utils/fileParser';
 import { readAndHighlight } from '../utils/speech';
-import { AppBar, Toolbar, Button, Select, MenuItem, Input } from '@mui/material';
+import { AppBar, Toolbar, Button, Select, MenuItem, Input, IconButton } from '@mui/material';
+import { PlayArrow, Pause, Save, UploadFile } from '@mui/icons-material';
 import { useTheme } from '../context/ThemeContext';
 
 const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: File) => void }> = ({ setText, onFileLoad }) => {
@@ -69,15 +70,15 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5', borderBottom: '1px solid #8B5523' }}>
-      <Toolbar sx={{ justifyContent: 'center', gap: 2 }}>
-        <Button onClick={togglePlayPause} color="primary" variant="contained">
-          {isPlaying ? 'Pause' : 'Play'}
-        </Button>
+    <AppBar position="sticky" sx={{ backgroundColor: themeMode === 'dark' ? '#1A1A1A' : '#FFFFFF', borderBottom: '1px solid #8B5523', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+      <Toolbar sx={{ justifyContent: 'center', gap: 2, py: 1 }}>
+        <IconButton onClick={togglePlayPause} color="primary" sx={{ bgcolor: themeMode === 'dark' ? '#2A2A2A' : '#F0F0F0', borderRadius: 4 }}>
+          {isPlaying ? <Pause /> : <PlayArrow />}
+        </IconButton>
         <Select
           value={speed}
           onChange={(e) => setSpeed(parseFloat(e.target.value as string))}
-          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#A1A1A1' : '#FFFFFF' }}
+          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#2A2A2A' : '#FFFFFF', borderRadius: 4, height: 40 }}
         >
           <MenuItem value={0.5}>0.5x</MenuItem>
           <MenuItem value={1}>1x</MenuItem>
@@ -86,7 +87,7 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
         <Select
           value={selectedVoice}
           onChange={(e) => setSelectedVoice(e.target.value as string)}
-          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#A1A1A1' : '#FFFFFF', minWidth: 150 }}
+          sx={{ color: '#D2B48C', backgroundColor: themeMode === 'dark' ? '#2A2A2A' : '#FFFFFF', borderRadius: 4, height: 40, minWidth: 150 }}
         >
           {voices.map((voice) => (
             <MenuItem key={voice.name} value={voice.name}>
@@ -98,8 +99,10 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
           color="primary"
           variant="contained"
           onClick={handleFileButtonClick}
+          startIcon={<UploadFile />}
+          sx={{ borderRadius: 4 }}
         >
-          Choose File
+          Upload File
         </Button>
         <Input
           type="file"
@@ -108,9 +111,9 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
           inputRef={fileInputRef}
           sx={{ display: 'none' }}
         />
-        <Button onClick={saveProgress} color="primary" variant="contained">
-          Save
-        </Button>
+        <IconButton onClick={saveProgress} color="primary" sx={{ bgcolor: themeMode === 'dark' ? '#2A2A2A' : '#F0F0F0', borderRadius: 4 }}>
+          <Save />
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

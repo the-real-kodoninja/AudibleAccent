@@ -1,4 +1,4 @@
-// src/App.tsx
+// client/src/App.tsx
 import React, { useState, useEffect } from 'react';
 import TopBar from './components/TopBar';
 import TextReader from './components/TextReader';
@@ -23,33 +23,34 @@ const App: React.FC = () => {
   const theme = createTheme({
     palette: {
       mode: themeMode,
-      background: { default: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5' },
-      text: { primary: themeMode === 'dark' ? '#A1A1A1' : '#333333' },
+      background: { default: themeMode === 'dark' ? '#121212' : '#F5F5F5' }, // Darker background for dark mode
+      text: { primary: themeMode === 'dark' ? '#E0E0E0' : '#333333' }, // Better contrast
       primary: { main: '#8B5523' },
       secondary: { main: '#D2B48C' },
     },
     typography: {
-      fontFamily: 'Roboto, sans-serif',
-      h6: { color: themeMode === 'dark' ? '#A1A1A1' : '#333333' },
+      fontFamily: fontFamily || 'Roboto, sans-serif',
+      h6: { color: themeMode === 'dark' ? '#E0E0E0' : '#333333', fontWeight: 500 },
     },
     components: {
-      MuiButton: { styleOverrides: { root: { borderRadius: 0, textTransform: 'none', padding: '8px 16px' } } },
-      MuiSelect: { styleOverrides: { root: { borderRadius: 0 } } },
-      MuiTabs: { styleOverrides: { root: { backgroundColor: themeMode === 'dark' ? '#1A1A1A' : '#F5F5F5' } } },
+      MuiButton: { styleOverrides: { root: { borderRadius: 4, textTransform: 'none', padding: '8px 16px', transition: 'all 0.3s' } } },
+      MuiSelect: { styleOverrides: { root: { borderRadius: 4 } } },
+      MuiTabs: { styleOverrides: { root: { backgroundColor: themeMode === 'dark' ? '#1A1A1A' : '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' } } },
       MuiTab: {
         styleOverrides: {
           root: {
-            color: themeMode === 'dark' ? '#A1A1A1' : '#333333',
-            '&.Mui-selected': { color: '#D2B48C' },
+            color: themeMode === 'dark' ? '#A1A1A1' : '#666666',
+            '&.Mui-selected': { color: '#D2B48C', fontWeight: 600 },
             fontWeight: 500,
+            transition: 'color 0.3s',
           },
         },
       },
       MuiTextField: {
         styleOverrides: {
           root: {
-            '& .MuiInputBase-root': { backgroundColor: themeMode === 'dark' ? '#2A2A2A' : '#FFFFFF' },
-            '& .MuiInputLabel-root': { color: themeMode === 'dark' ? '#A1A1A1' : '#333333' },
+            '& .MuiInputBase-root': { backgroundColor: themeMode === 'dark' ? '#2A2A2A' : '#FFFFFF', borderRadius: 4 },
+            '& .MuiInputLabel-root': { color: themeMode === 'dark' ? '#A1A1A1' : '#666666' },
           },
         },
       },
@@ -104,16 +105,16 @@ const App: React.FC = () => {
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <TopBar setText={handleSetText} onFileLoad={handleFileLoad} />
-      <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523' }}>
+      <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523', mb: 2 }}>
         <Tab label="Reader" />
         <Tab label="Read Log" />
         <Tab label="User" />
       </Tabs>
-      <Box sx={{ display: 'flex', height: 'calc(100vh - 112px)' }}>
+      <Box sx={{ display: 'flex', height: 'calc(100vh - 128px)', backgroundColor: themeMode === 'dark' ? '#121212' : '#F5F5F5' }}>
         {tab === 0 && pages.length > 0 && (
           <PagePreview pages={pages} currentPage={currentPage} onPageSelect={setCurrentPage} />
         )}
-        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', p: 3 }}>
           {tab === 0 &&
             (text ? (
               <TextReader
