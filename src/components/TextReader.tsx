@@ -27,21 +27,43 @@ const TextReader: React.FC<TextReaderProps> = ({
   });
   const [searchTerm, setSearchTerm] = useState('');
   const textRef = useRef<HTMLDivElement>(null);
+  const [pageTexts, setPageTexts] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log('TextReader rendering with text:', text);
-    readAndHighlight(text, 1, currentIndex, setCurrentIndex, undefined, () => {
-      // On end of reading, move to next page if available
+    const pages = text.split('\n').filter(page => page.trim() !== '');
+    console.log('Split pages:', pages);
+    setPageTexts(pages);
+    setCurrentIndex(0);
+  }, [text]);
+
+  const currentPageText = pageTexts[currentPage - 1] || '';
+
+  useEffect(() => {
+    if (currentPageText) {
+      console.log('TextReader rendering page:', currentPage, 'text:', currentPageText);
+      readAndHighlight(
+        currentPageText,
+        1,
+        currentIndex,
+        setCurrentIndex,
+        undefined,
+        () => {
+          if (currentPage < totalPages) {
+            onPageChange(currentPage + 1);
+            setCurrentIndex(0);
+          }
+        }
+      );
+    } else {
+      console.warn('Current page text is empty for page:', currentPage);
       if (currentPage < totalPages) {
         onPageChange(currentPage + 1);
-        setCurrentIndex(0); // Reset index for the new page
       }
-    });
-  }, [text, currentIndex, currentPage, totalPages, onPageChange]);
+    }
+  }, [currentPageText, currentIndex, currentPage, totalPages, onPageChange]);
 
   useEffect(() => {
     localStorage.setItem(`progress_${text.slice(0, 10)}`, currentIndex.toString());
-    // Auto-scroll to the highlighted word
     if (textRef.current) {
       const highlighted = textRef.current.querySelector('.highlight') as HTMLElement;
       if (highlighted) {
@@ -55,18 +77,18 @@ const TextReader: React.FC<TextReaderProps> = ({
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       const selectedText = range.toString();
-      const words = text.split(' ');
+      const words = currentPageText.split(' ');
       const index = words.findIndex((word) => selectedText.includes(word));
       if (index !== -1) {
         setCurrentIndex(index);
-        readAndHighlight(text, 1, index, setCurrentIndex);
+        readAndHighlight(currentPageText, 1, index, setCurrentIndex);
       }
     }
   };
 
   const handleSearch = () => {
     if (searchTerm && textRef.current) {
-      const words = text.split(' ');
+      const words = currentPageText.split(' ');
       const index = words.findIndex((word) => word.toLowerCase().includes(searchTerm.toLowerCase()));
       if (index !== -1) {
         setCurrentIndex(index);
@@ -78,7 +100,15 @@ const TextReader: React.FC<TextReaderProps> = ({
     }
   };
 
-  const words = text.split(' ').map((word, index) => (
+  if (!currentPageText) {
+    return (
+      <Box sx={{ p: 2, color: '#A1A1A1', height: '100%', overflowY: 'auto' }}>
+        <Typography>No content available for this page.</Typography>
+      </Box>
+    );
+  }
+
+  const words = currentPageText.split(' ').map((word, index) => (
     <span
       key={index}
       className={`word ${index === currentIndex ? 'highlight' : ''}`}

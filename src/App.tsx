@@ -8,9 +8,10 @@ import UserPage from './components/UserPage';
 import PagePreview from './components/PagePreview';
 import { ThemeProvider as MuiThemeProvider, CssBaseline, createTheme, Box, Tabs, Tab } from '@mui/material';
 import * as pdfjsLib from 'pdfjs-dist';
-import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
+import { useTheme } from './context/ThemeContext';
 
 const App: React.FC = () => {
+  const { themeMode } = useTheme();
   const [text, setText] = useState<string>('');
   const [tab, setTab] = useState(0);
   const [textSize, setTextSize] = useState<number>(() => parseInt(localStorage.getItem('textSize') || '16', 10));
@@ -18,7 +19,6 @@ const App: React.FC = () => {
   const [fontFamily, setFontFamily] = useState<string>(() => localStorage.getItem('fontFamily') || 'Roboto');
   const [pages, setPages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pdfDoc, setPdfDoc] = useState<any>(null);
 
   const theme = createTheme({
     palette: {
@@ -72,11 +72,15 @@ const App: React.FC = () => {
     setTab(newValue);
   };
 
+  const handleSetText = (newText: string) => {
+    console.log('Setting text in App:', newText);
+    setText(newText);
+  };
+
   const handleFileLoad = async (file: File) => {
     if (file.type === 'application/pdf') {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-      setPdfDoc(pdf);
       const pageImages: string[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -92,57 +96,49 @@ const App: React.FC = () => {
       setCurrentPage(1);
     } else {
       setPages([]);
-      setPdfDoc(null);
       setCurrentPage(1);
     }
   };
 
-  const handleSetText = (newText: string) => {
-    console.log('Setting text in App:', newText);
-    setText(newText);
-  };
-
   return (
-    <CustomThemeProvider>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        <TopBar setText={handleSetText} onFileLoad={handleFileLoad} />
-        <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523' }}>
-          <Tab label="Reader" />
-          <Tab label="Read Log" />
-          <Tab label="User" />
-        </Tabs>
-        <Box sx={{ display: 'flex', height: 'calc(100vh - 112px)' }}>
-          {tab === 0 && pages.length > 0 && (
-            <PagePreview pages={pages} currentPage={currentPage} onPageSelect={setCurrentPage} />
-          )}
-          <Box sx={{ flex: 1, overflowY: 'auto' }}>
-            {tab === 0 &&
-              (text ? (
-                <TextReader
-                  text={text}
-                  textSize={textSize}
-                  highlightColor={highlightColor}
-                  fontFamily={fontFamily}
-                  onPageChange={setCurrentPage}
-                  currentPage={currentPage}
-                  totalPages={pages.length || 1}
-                />
-              ) : (
-                <WelcomeScreen />
-              ))}
-            {tab === 1 && <ReadLog />}
-            {tab === 2 && (
-              <UserPage
-                setTextSize={setTextSize}
-                setHighlightColor={setHighlightColor}
-                setFontFamily={setFontFamily}
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <TopBar setText={handleSetText} onFileLoad={handleFileLoad} />
+      <Tabs value={tab} onChange={handleTabChange} centered sx={{ borderBottom: '1px solid #8B5523' }}>
+        <Tab label="Reader" />
+        <Tab label="Read Log" />
+        <Tab label="User" />
+      </Tabs>
+      <Box sx={{ display: 'flex', height: 'calc(100vh - 112px)' }}>
+        {tab === 0 && pages.length > 0 && (
+          <PagePreview pages={pages} currentPage={currentPage} onPageSelect={setCurrentPage} />
+        )}
+        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+          {tab === 0 &&
+            (text ? (
+              <TextReader
+                text={text}
+                textSize={textSize}
+                highlightColor={highlightColor}
+                fontFamily={fontFamily}
+                onPageChange={setCurrentPage}
+                currentPage={currentPage}
+                totalPages={pages.length || 1}
               />
-            )}
-          </Box>
+            ) : (
+              <WelcomeScreen />
+            ))}
+          {tab === 1 && <ReadLog />}
+          {tab === 2 && (
+            <UserPage
+              setTextSize={setTextSize}
+              setHighlightColor={setHighlightColor}
+              setFontFamily={setFontFamily}
+            />
+          )}
         </Box>
-      </MuiThemeProvider>
-    </CustomThemeProvider>
+      </Box>
+    </MuiThemeProvider>
   );
 };
 

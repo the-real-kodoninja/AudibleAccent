@@ -2,7 +2,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import ePub from 'epubjs';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 export const parseFile = async (file: File): Promise<string> => {
   const fileType = file.type;
@@ -21,8 +21,12 @@ export const parseFile = async (file: File): Promise<string> => {
 
 const parsePDF = async (file: File): Promise<string> => {
   try {
+    console.log('Starting PDF parsing...');
     const arrayBuffer = await file.arrayBuffer();
     console.log('PDF arrayBuffer size:', arrayBuffer.byteLength);
+    if (arrayBuffer.byteLength === 0) {
+      throw new Error('PDF file is empty');
+    }
     const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
     console.log('PDF loaded, pages:', pdf.numPages);
     let fullText = '';
@@ -31,10 +35,14 @@ const parsePDF = async (file: File): Promise<string> => {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageText = textContent.items.map((item: any) => item.str || '').join(' ');
+      console.log(`Page ${i} text:`, pageText);
       fullText += pageText + '\n';
     }
 
     console.log('PDF parsed text:', fullText);
+    if (!fullText.trim()) {
+      console.warn('Parsed PDF text is empty');
+    }
     return fullText.trim();
   } catch (error: any) {
     console.error('PDF parsing error:', error);

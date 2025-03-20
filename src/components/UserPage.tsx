@@ -19,9 +19,11 @@ interface UserPageProps {
 const UserPage: React.FC<UserPageProps> = ({ setTextSize, setHighlightColor, setFontFamily }) => {
   const [user, setUser] = useState<UserData>(() => {
     const savedUser = localStorage.getItem('userData');
-    return savedUser
+    const initialUser = savedUser
       ? JSON.parse(savedUser)
       : { name: 'Guest', booksRead: 0, lastLogin: new Date().toISOString() };
+    const log = JSON.parse(localStorage.getItem('readLog') || '[]');
+    return { ...initialUser, booksRead: log.length, lastLogin: new Date().toISOString() };
   });
   const [editUser, setEditUser] = useState<UserData>({ ...user });
   const [isEditing, setIsEditing] = useState(false);
@@ -32,12 +34,8 @@ const UserPage: React.FC<UserPageProps> = ({ setTextSize, setHighlightColor, set
   const { themeMode, setThemeMode } = useTheme();
 
   useEffect(() => {
-    const log = JSON.parse(localStorage.getItem('readLog') || '[]');
-    const updatedUser = { ...user, booksRead: log.length, lastLogin: new Date().toISOString() };
-    setUser(updatedUser);
-    setEditUser(updatedUser);
-    localStorage.setItem('userData', JSON.stringify(updatedUser));
-  }, []);
+    localStorage.setItem('userData', JSON.stringify(user));
+  }, [user]);
 
   const handleInputChange = (field: keyof UserData, value: string) => {
     setEditUser({ ...editUser, [field]: value });
@@ -45,7 +43,6 @@ const UserPage: React.FC<UserPageProps> = ({ setTextSize, setHighlightColor, set
 
   const saveChanges = () => {
     setUser(editUser);
-    localStorage.setItem('userData', JSON.stringify(editUser));
     setTextSize(textSize);
     setHighlightColor(highlightColor);
     setFontFamily(fontFamily);
@@ -69,7 +66,6 @@ const UserPage: React.FC<UserPageProps> = ({ setTextSize, setHighlightColor, set
         const updatedUser = { ...editUser, avatar: avatarData };
         setEditUser(updatedUser);
         setUser(updatedUser);
-        localStorage.setItem('userData', JSON.stringify(updatedUser));
       };
       reader.readAsDataURL(file);
     }

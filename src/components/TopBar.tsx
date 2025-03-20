@@ -28,6 +28,7 @@ const TopBar: React.FC<{ setText: (text: string) => void; onFileLoad: (file: Fil
     const file = e.target.files?.[0];
     if (file) {
       try {
+        console.log('Uploading file:', file.name);
         const parsedText = await parseFile(file);
         console.log('Setting text in TopBar:', parsedText);
         setText(parsedText);
