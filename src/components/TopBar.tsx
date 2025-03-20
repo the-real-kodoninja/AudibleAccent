@@ -1,5 +1,5 @@
-// src/components/TopBar.tsx (just confirming)
-import React, { useState, useEffect } from 'react';
+// src/components/TopBar.tsx
+import React, { useState, useEffect, useRef } from 'react';
 import { parseFile } from '../utils/fileParser';
 import { readAndHighlight } from '../utils/speech';
 import { AppBar, Toolbar, Button, Select, MenuItem, Input } from '@mui/material';
@@ -9,6 +9,8 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<string>('');
+  const [text, setLocalText] = useState<string>(''); // Add local text state
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadVoices = () => {
@@ -24,10 +26,11 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const text = await parseFile(file);
-        setText(text);
+        const parsedText = await parseFile(file);
+        setText(parsedText);
+        setLocalText(parsedText); // Update local text state
         setIsPlaying(true);
-        readAndHighlight(text, speed, 0, () => {}, selectedVoice);
+        readAndHighlight(parsedText, speed, 0, () => {}, selectedVoice);
         const log = JSON.parse(localStorage.getItem('readLog') || '[]');
         log.unshift({ fileName: file.name, timestamp: new Date().toISOString() });
         localStorage.setItem('readLog', JSON.stringify(log));
@@ -56,6 +59,10 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
     alert(`Progress saved at word ${currentIndex}`);
   };
 
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #8B5523' }}>
       <Toolbar sx={{ justifyContent: 'center', gap: 2 }}>
@@ -82,11 +89,19 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
             </MenuItem>
           ))}
         </Select>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleFileButtonClick}
+        >
+          Choose File
+        </Button>
         <Input
           type="file"
           inputProps={{ accept: '.pdf,.epub,.txt' }}
           onChange={handleUpload}
-          sx={{ color: '#D2B48C' }}
+          inputRef={fileInputRef}
+          sx={{ display: 'none' }} // Hide the default input
         />
         <Button onClick={saveProgress} color="primary" variant="contained">
           Save

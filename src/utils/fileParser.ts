@@ -1,6 +1,7 @@
 // src/utils/fileParser.ts
 import * as pdfjsLib from 'pdfjs-dist';
 import ePub from 'epubjs';
+import 'pdfjs-dist/build/pdf.worker.entry';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
@@ -19,18 +20,23 @@ export const parseFile = async (file: File): Promise<string> => {
 };
 
 const parsePDF = async (file: File): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-  let fullText = '';
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+    let fullText = '';
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    const pageText = textContent.items.map((item: any) => item.str).join(' ');
-    fullText += pageText + ' ';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(' ');
+      fullText += pageText + ' ';
+    }
+
+    return fullText.trim();
+  } catch (error) {
+    console.error('PDF parsing error:', error);
+    throw error;
   }
-
-  return fullText.trim();
 };
 
 const parseEPUB = async (file: File): Promise<string> => {
@@ -39,7 +45,7 @@ const parseEPUB = async (file: File): Promise<string> => {
   let fullText = '';
 
   const contents = await book.loaded.spine;
-  for (const item of (contents as any).items) { // Type assertion for TS2339 fix
+  for (const item of (contents as any).items) {
     const doc = await item.load(book.load.bind(book));
     fullText += doc.documentElement.textContent || '';
   }
