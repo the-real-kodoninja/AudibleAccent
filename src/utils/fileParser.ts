@@ -1,8 +1,8 @@
 // src/utils/fileParser.ts
 import * as pdfjsLib from 'pdfjs-dist';
 import ePub from 'epubjs';
-import 'pdfjs-dist/build/pdf.worker.entry';
 
+// Use the CDN for the worker (or bundle it locally if needed)
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 export const parseFile = async (file: File): Promise<string> => {

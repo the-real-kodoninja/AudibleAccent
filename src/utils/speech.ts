@@ -1,14 +1,26 @@
-export const readAndHighlight = (text: string, speed: number) => {
+// src/utils/speech.ts
+export const readAndHighlight = (
+    text: string,
+    speed: number,
+    startIndex: number = 0,
+    setCurrentIndex: (index: number) => void,
+    voiceName?: string
+  ) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = speed;
-    let currentWordIndex = 0;
+    if (voiceName) {
+      const voice = window.speechSynthesis.getVoices().find((v) => v.name === voiceName);
+      if (voice) utterance.voice = voice;
+    }
+    let currentWordIndex = startIndex;
   
     utterance.onboundary = (event) => {
-      if (event.name === 'word') {
+      if (event.name === 'word' && currentWordIndex < text.split(' ').length) {
         const words = document.querySelectorAll('.word');
         words.forEach((word, index) =>
           word.classList.toggle('highlight', index === currentWordIndex)
         );
+        setCurrentIndex(currentWordIndex);
         currentWordIndex++;
       }
     };

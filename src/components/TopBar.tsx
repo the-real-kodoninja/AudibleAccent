@@ -9,7 +9,7 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<string>('');
-  const [text, setLocalText] = useState<string>(''); // Add local text state
+  const [text, setLocalText] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,9 +28,9 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
       try {
         const parsedText = await parseFile(file);
         setText(parsedText);
-        setLocalText(parsedText); // Update local text state
+        setLocalText(parsedText);
         setIsPlaying(true);
-        readAndHighlight(parsedText, speed, 0, () => {}, selectedVoice);
+        readAndHighlight(parsedText, speed, 0, () => {}, selectedVoice); // Matches 5 args
         const log = JSON.parse(localStorage.getItem('readLog') || '[]');
         log.unshift({ fileName: file.name, timestamp: new Date().toISOString() });
         localStorage.setItem('readLog', JSON.stringify(log));
@@ -101,7 +101,7 @@ const TopBar: React.FC<{ setText: (text: string) => void }> = ({ setText }) => {
           inputProps={{ accept: '.pdf,.epub,.txt' }}
           onChange={handleUpload}
           inputRef={fileInputRef}
-          sx={{ display: 'none' }} // Hide the default input
+          sx={{ display: 'none' }}
         />
         <Button onClick={saveProgress} color="primary" variant="contained">
           Save

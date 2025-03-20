@@ -13,7 +13,7 @@ const TextReader: React.FC<TextReaderProps> = ({ text }) => {
   });
 
   useEffect(() => {
-    readAndHighlight(text, 1, currentIndex, setCurrentIndex);
+    readAndHighlight(text, 1, currentIndex, setCurrentIndex); // Matches 4 args
   }, [text]);
 
   useEffect(() => {
